@@ -25,8 +25,42 @@
 
 namespace svm{
 
-static cv::Ptr<cv::ml::StatModel> _new(const svm::factory::type & type){
-  
+static cv::Ptr<cv::ml::StatModel> factory::_new(const svm::factory::type & type){
+
+  auto algorithm = cv::ml::SVM::create();
+  auto criteria = cv::TermCriteria();
+
+  criteria.type = CV_TERMCRIT_EPS;
+  criteria.epsilon = 1e-10;
+
+  switch (type) {
+    case linear:
+      algorithm->setC(100);
+      algorithm->setKernel(linear_svm->LINEAR);
+      algorithm->setTermCriteria(criteria);
+      algorithm->setType(linear_svm->C_SVC);
+      break;
+    case rbf:
+      sigmoid_svm->setC(100);
+      sigmoid_svm->setGamma(0.1);
+      sigmoid_svm->setCoef0(0.3);
+      sigmoid_svm->setTermCriteria(criteria);
+      rbf_svm->setKernel(rbf_svm->RBF);
+      rbf_svm->setType(rbf_svm->C_SVC);
+      break;
+    case sigmoid:
+      sigmoid_svm->setC(100);
+      sigmoid_svm->setGamma(0.1);
+      sigmoid_svm->setCoef0(0.3);
+      sigmoid_svm->setTermCriteria(criteria);
+      sigmoid_svm->setKernel(rbf_svm->SIGMOID);
+      sigmoid_svm->setType(sigmoid_svm->C_SVC);
+      break;
+    default:
+      throw "invalid type.";
+  }
+
+  return algorithm;
 }
 
-}
+};
