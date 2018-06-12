@@ -22,6 +22,28 @@
 
 #include "svm.hh"
 
+namespace utils{
+
+  namespace data{
+
+    cv::Ptr<cv::ml::TrainData> factory::_new(const svm::factory::type & type){
+
+      auto filename = std::string();
+
+      switch (type) {
+        case blob:
+          filename = std::string("blob.txt");
+        case circle:
+          filename = std::string("circle.txt");
+        case moon:
+          filename = std::string("moon.txt");
+        default:
+          filename = std::string("moon.txt");
+      }
+      return readTextFile(path+filename);
+    }
+  }
+}
 
 namespace svm{
 
@@ -65,7 +87,42 @@ cv::Ptr<cv::ml::StatModel> factory::_new(const svm::factory::type & type){
 
 };
 
-int main(){
+int main(int argc, const char * argv[]) {
 
-  
+   utils::data::factory::path = std::string(argv[1]);
+
+   auto data = utils::data::factory::_new(utils::data::factory::type::blob);
+   auto algo = utils::svm::factory::_new(utils::svm::factory::type::linear);
+
+   auto y_predict = cv::OutputArray(data.second);
+
+   y_predict.clear();
+
+   trainData->setTrainTestSplitRatio(0.2,true);
+
+   model.second->train(trainData);
+
+   auto error = model.second->calcError(trainData, true, y_predict);
+
+   auto filename = path + data.first + "_" +model.first + ".txt";
+
+   cv::Mat feature_row = cv::Mat::ones(1, 2, CV_32F);
+
+   feature_row = data.second.at("features");
+
+   cv::Mat label_row = cv::Mat();
+
+   model.second->predict(feature_row,y_predict);
+
+   std::ofstream output(filename);
+
+   output << "x1" << "," << "x2" << "," << "y" << "\n";
+
+   for(int i = 0; i < feature_row.rows; i++){
+
+       auto input = cv::InputArray(feature_row.row(i));
+
+       output << feature_row.at<float>(i,0) << "," << feature_row.at<float>(i,1)  << "," <<  y_predict.getMatRef().at<float>(i,0) << "\n";
+   }
+
 }

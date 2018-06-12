@@ -84,9 +84,11 @@ namespace utils{
 
       static cv::Ptr<cv::ml::TrainData> _new(const utils::data::factory::type&);
 
+    private:
+      static std::string path;
+
     };
   };
-
 };
 
 namespace svm{
@@ -102,5 +104,4 @@ namespace svm{
 
     static cv::Ptr<cv::ml::StatModel> _new(const svm::factory::type&);
   };
-
 };
