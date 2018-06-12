@@ -24,17 +24,16 @@
 #include <memory>
 #include <fstream>
 #include <sstream>
+#include <map>
+#include <unordered_map>
 #include <opencv2/imgproc.hpp>
-#include <opencv2/highgui.hpp>
 #include <opencv2/core.hpp>
 #include <opencv2/ml.hpp>
 
 
 namespace utils{
 
-  std::map<std::string, cv::Mat> readTextFile(std::string path){
-
-    std::map<std::string, cv::Mat> result;
+  cv::Ptr<cv::ml::TrainData> readTextFile(std::string path){
 
     std::pair<std::string, cv::Mat> features_pair,labels_pair;
 
@@ -69,18 +68,29 @@ namespace utils{
         labels.push_back(label_row);
     }
 
-    features_pair = std::pair<std::string, cv::Mat>(std::string("features"),features);
-    labels_pair = std::pair<std::string, cv::Mat>(std::string("labels"),labels);
-
-    result.insert(features_pair);
-    result.insert(labels_pair);
+    cv::Ptr<cv::ml::TrainData> result = cv::ml::TrainData::create(features, 0, labels);
 
     return result;
-}
+  }
+
+  namespace data{
+    class factory{
+    public:
+      enum type{
+        blob,
+        circle,
+        moon
+      };
+
+      static cv::Ptr<cv::ml::TrainData> _new(const utils::data::factory::type&);
+
+    };
+  };
 
 };
+
 namespace svm{
-   /**/
+
   class factory{
     public:
 

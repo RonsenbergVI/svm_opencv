@@ -20,12 +20,12 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#include "svm.cc"
+#include "svm.hh"
 
 
 namespace svm{
 
-static cv::Ptr<cv::ml::StatModel> factory::_new(const svm::factory::type & type){
+cv::Ptr<cv::ml::StatModel> factory::_new(const svm::factory::type & type){
 
   auto algorithm = cv::ml::SVM::create();
   auto criteria = cv::TermCriteria();
@@ -36,25 +36,25 @@ static cv::Ptr<cv::ml::StatModel> factory::_new(const svm::factory::type & type)
   switch (type) {
     case linear:
       algorithm->setC(100);
-      algorithm->setKernel(linear_svm->LINEAR);
+      algorithm->setKernel(algorithm->LINEAR);
       algorithm->setTermCriteria(criteria);
-      algorithm->setType(linear_svm->C_SVC);
+      algorithm->setType(algorithm->C_SVC);
       break;
     case rbf:
-      sigmoid_svm->setC(100);
-      sigmoid_svm->setGamma(0.1);
-      sigmoid_svm->setCoef0(0.3);
-      sigmoid_svm->setTermCriteria(criteria);
-      rbf_svm->setKernel(rbf_svm->RBF);
-      rbf_svm->setType(rbf_svm->C_SVC);
+      algorithm->setC(100);
+      algorithm->setGamma(0.1);
+      algorithm->setCoef0(0.3);
+      algorithm->setTermCriteria(criteria);
+      algorithm->setKernel(algorithm->RBF);
+      algorithm->setType(algorithm->C_SVC);
       break;
     case sigmoid:
-      sigmoid_svm->setC(100);
-      sigmoid_svm->setGamma(0.1);
-      sigmoid_svm->setCoef0(0.3);
-      sigmoid_svm->setTermCriteria(criteria);
-      sigmoid_svm->setKernel(rbf_svm->SIGMOID);
-      sigmoid_svm->setType(sigmoid_svm->C_SVC);
+      algorithm->setC(100);
+      algorithm->setGamma(0.1);
+      algorithm->setCoef0(0.3);
+      algorithm->setTermCriteria(criteria);
+      algorithm->setKernel(algorithm->SIGMOID);
+      algorithm->setType(algorithm->C_SVC);
       break;
     default:
       throw "invalid type.";
@@ -64,3 +64,8 @@ static cv::Ptr<cv::ml::StatModel> factory::_new(const svm::factory::type & type)
 }
 
 };
+
+int main(){
+
+  
+}
