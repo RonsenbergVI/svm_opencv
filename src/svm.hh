@@ -22,13 +22,65 @@
 
 #include <iostream>
 #include <memory>
+#include <fstream>
+#include <sstream>
 #include <opencv2/imgproc.hpp>
 #include <opencv2/highgui.hpp>
 #include <opencv2/core.hpp>
 #include <opencv2/ml.hpp>
 
-namespace svm{
 
+namespace utils{
+
+  std::map<std::string, cv::Mat> readTextFile(std::string path){
+
+    std::map<std::string, cv::Mat> result;
+
+    std::pair<std::string, cv::Mat> features_pair,labels_pair;
+
+    cv::Mat feature_row = cv::Mat::ones(1, 2, CV_32F);
+
+    cv::Mat label_row = cv::Mat::ones(1, 1, CV_32S);
+
+    cv::Mat features, labels;
+
+    std::string str;
+
+    std::ifstream file(path);
+
+    float x,y,z;
+
+    while(getline(file, str, '\n')){
+
+        std::stringstream ss(str);
+
+        ss >> x >> y >> z;
+
+        std::cout << x << "\n";
+
+        feature_row.at<float>(0, 0) = x;
+
+        feature_row.at<float>(0, 1) = y;
+
+        label_row.at<float>(0, 0) = z;
+
+        features.push_back(feature_row);
+
+        labels.push_back(label_row);
+    }
+
+    features_pair = std::pair<std::string, cv::Mat>(std::string("features"),features);
+    labels_pair = std::pair<std::string, cv::Mat>(std::string("labels"),labels);
+
+    result.insert(features_pair);
+    result.insert(labels_pair);
+
+    return result;
+}
+
+};
+namespace svm{
+   /**/
   class factory{
     public:
 
