@@ -33,45 +33,8 @@
 
 namespace utils{
 
-  cv::Ptr<cv::ml::TrainData> readTextFile(std::string path){
-
-    std::pair<std::string, cv::Mat> features_pair,labels_pair;
-
-    cv::Mat feature_row = cv::Mat::ones(1, 2, CV_32F);
-
-    cv::Mat label_row = cv::Mat::ones(1, 1, CV_32S);
-
-    cv::Mat features, labels;
-
-    std::string str;
-
-    std::ifstream file(path);
-
-    float x,y,z;
-
-    while(getline(file, str, '\n')){
-
-        std::stringstream ss(str);
-
-        ss >> x >> y >> z;
-
-        std::cout << x << "\n";
-
-        feature_row.at<float>(0, 0) = x;
-
-        feature_row.at<float>(0, 1) = y;
-
-        label_row.at<float>(0, 0) = z;
-
-        features.push_back(feature_row);
-
-        labels.push_back(label_row);
-    }
-
-    cv::Ptr<cv::ml::TrainData> result = cv::ml::TrainData::create(features, 0, labels);
-
-    return result;
-  }
+  cv::Ptr<cv::ml::TrainData> read(std::string);
+  void train(svm::factory::data,utils::data::factory::type);
 
   namespace data{
     class factory{
@@ -82,6 +45,7 @@ namespace utils{
         moon
       };
 
+      static std::string text(data::factory::type)
       static cv::Ptr<cv::ml::TrainData> _new(const utils::data::factory::type&);
 
     private:
@@ -92,7 +56,6 @@ namespace utils{
 };
 
 namespace svm{
-
   class factory{
     public:
 
@@ -103,5 +66,6 @@ namespace svm{
     };
 
     static cv::Ptr<cv::ml::StatModel> _new(const svm::factory::type&);
+
   };
 };
