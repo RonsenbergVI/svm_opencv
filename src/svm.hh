@@ -30,7 +30,6 @@
 #include <opencv2/core.hpp>
 #include <opencv2/ml.hpp>
 
-
 namespace utils{
 
   cv::Ptr<cv::ml::TrainData> read(std::string);
