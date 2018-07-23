@@ -156,6 +156,14 @@ namespace svm{
         algorithm->setKernel(algorithm->SIGMOID);
         algorithm->setType(algorithm->C_SVC);
         break;
+      case chi2:
+        algorithm->setC(100);
+        algorithm->setGamma(0.1);
+        algorithm->setCoef0(0.3);
+        algorithm->setTermCriteria(criteria);
+        algorithm->setKernel(algorithm->CHI2);
+        algorithm->setType(algorithm->C_SVC);
+        break;
       default:
         throw "invalid type";
     }
@@ -168,7 +176,9 @@ int main(int argc, const char * argv[]) {
 
    utils::data::factory::path = std::string(argv[1]);
 
-   auto data = utils::data::factory::_new(utils::data::factory::type::blob);
-   auto algo = utils::svm::factory::_new(utils::svm::factory::type::linear);
+   //auto data = utils::data::factory::_new(utils::data::factory::type::blob);
+   //auto algo = utils::svm::factory::_new(utils::svm::factory::type::linear);
+
+   train(svm::factory::type::linear,utils::data::factory::type::blob);
 
 }

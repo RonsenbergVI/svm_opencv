@@ -61,7 +61,8 @@ namespace svm{
     enum type {
       linear,
       rbf,
-      sigmoid
+      sigmoid,
+      chi2
     };
 
     static cv::Ptr<cv::ml::StatModel> _new(const svm::factory::type&);
