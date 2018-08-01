@@ -43,7 +43,7 @@ namespace svm{
       chi2
     };
 
-    static cv::Ptr<cv::ml::StatModel> _new(const factory::type&);
+    static cv::Ptr<cv::ml::StatModel> _new(const svm::factory::type&);
 
   };
 }
@@ -60,12 +60,12 @@ namespace utils{
       };
 
       static std::string text(const data::factory::type&);
-      static cv::Ptr<cv::ml::TrainData> _new(const data::factory::type&);
+      static cv::Ptr<cv::ml::TrainData> _new(const utils::data::factory::type&);
       static std::string path;
 
     };
   }
 
   cv::Ptr<cv::ml::TrainData> read(std::string);
-  double train(const svm::factory::type& ,const data::factory::type&);
+  float train(const svm::factory::type& ,const data::factory::type&);
 }

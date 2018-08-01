@@ -22,6 +22,8 @@
 
 #include "svm.hh"
 
+std::string utils::data::factory::path = std::string("");
+
 namespace utils{
 
   cv::Ptr<cv::ml::TrainData> read(std::string path){
@@ -33,6 +35,8 @@ namespace utils{
     cv::Mat features, labels;
 
     std::string str;
+
+    std::cout << path << "\n";
 
     std::ifstream file(path);
 
@@ -55,15 +59,15 @@ namespace utils{
         labels.push_back(label_row);
     }
 
-    cv::Ptr<cv::ml::TrainData> result = cv::ml::TrainData::create(features, 0, labels);
+    auto result = cv::ml::TrainData::create(features, 0, labels);
 
     return result;
   }
 
-  double train(const svm::factory::type& modelType, const data::factory::type& dataType){
+  float train(const svm::factory::type& modelType, const data::factory::type& dataType){
 
-    auto model = data::factory::_new(modelType);
-    auto data = svm::factory::_new(dataType);
+    auto data = utils::data::factory::_new(dataType);
+    auto model = svm::factory::_new(modelType);
 
     auto y_ = cv::OutputArray(cv::Mat());
 
@@ -76,14 +80,12 @@ namespace utils{
     auto error = model->calcError(data, true, y_);
 
     return error;
-
   }
 
   namespace data{
 
     std::string factory::text(const factory::type& type){
-      switch(type)
-      {
+      switch(type){
       case blob:
         return "blob";
       case circle:
@@ -96,14 +98,14 @@ namespace utils{
     }
 
     cv::Ptr<cv::ml::TrainData> factory::_new(const data::factory::type& type){
-      return read(path+text(type));
+      return read(utils::data::factory::path+text(type)+".txt");
     }
   }
 }
 
 namespace svm{
 
-  cv::Ptr<cv::ml::StatModel> factory::_new(const factory::type& type){
+  cv::Ptr<cv::ml::StatModel> factory::_new(const svm::factory::type& type){
 
     auto algorithm = cv::ml::SVM::create();
     auto criteria = cv::TermCriteria();
@@ -163,9 +165,6 @@ namespace svm{
 int main(int argc, const char * argv[]) {
 
    utils::data::factory::path = std::string(argv[1]);
-
-   //auto data = utils::data::factory::_new(utils::data::factory::type::blob);
-   //auto algo = utils::svm::factory::_new(utils::svm::factory::type::linear);
 
    std::cout << utils::train(svm::factory::type::linear, utils::data::factory::type::blob) << "\n";
 
