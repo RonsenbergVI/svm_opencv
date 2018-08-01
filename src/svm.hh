@@ -30,10 +30,25 @@
 #include <opencv2/core.hpp>
 #include <opencv2/ml.hpp>
 
-namespace utils{
 
-  cv::Ptr<cv::ml::TrainData> read(std::string);
-  void train(svm::factory::data,utils::data::factory::type);
+namespace svm{
+  class factory{
+    public:
+
+    enum type {
+      linear,
+      polymomial,
+      rbf,
+      sigmoid,
+      chi2
+    };
+
+    static cv::Ptr<cv::ml::StatModel> _new(const factory::type&);
+
+  };
+}
+
+namespace utils{
 
   namespace data{
     class factory{
@@ -44,28 +59,13 @@ namespace utils{
         moon
       };
 
-      static std::string text(data::factory::type)
-      static cv::Ptr<cv::ml::TrainData> _new(const utils::data::factory::type&);
-
-    private:
+      static std::string text(const data::factory::type&);
+      static cv::Ptr<cv::ml::TrainData> _new(const data::factory::type&);
       static std::string path;
 
     };
-  };
-};
+  }
 
-namespace svm{
-  class factory{
-    public:
-
-    enum type {
-      linear,
-      rbf,
-      sigmoid,
-      chi2
-    };
-
-    static cv::Ptr<cv::ml::StatModel> _new(const svm::factory::type&);
-
-  };
-};
+  cv::Ptr<cv::ml::TrainData> read(std::string);
+  double train(const svm::factory::type& ,const data::factory::type&);
+}

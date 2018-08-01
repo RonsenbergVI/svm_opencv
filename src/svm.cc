@@ -26,8 +26,6 @@ namespace utils{
 
   cv::Ptr<cv::ml::TrainData> read(std::string path){
 
-    std::pair<std::string, cv::Mat> features_pair,labels_pair;
-
     cv::Mat feature_row = cv::Mat::ones(1, 2, CV_32F);
 
     cv::Mat label_row = cv::Mat::ones(1, 1, CV_32S);
@@ -46,8 +44,6 @@ namespace utils{
 
         ss >> x >> y >> z;
 
-        std::cout << x << "\n";
-
         feature_row.at<float>(0, 0) = x;
 
         feature_row.at<float>(0, 1) = y;
@@ -64,68 +60,50 @@ namespace utils{
     return result;
   }
 
-  void train(svm::factory::data modelType, utils::data::factory::type dataType){
+  double train(const svm::factory::type& modelType, const data::factory::type& dataType){
 
-    auto model = _new(modelType);
-    auto data = _new(dataType);
+    auto model = data::factory::_new(modelType);
+    auto data = svm::factory::_new(dataType);
 
     auto y_ = cv::OutputArray(cv::Mat());
 
     y_.clear();
 
-    trainData->setTrainTestSplitRatio(0.2,true);
+    data->setTrainTestSplitRatio(0.2,true);
 
     model->train(data);
 
-    auto error = model->calcError(trainData, true, y_);
+    auto error = model->calcError(data, true, y_);
 
-    auto filename = path + "_linear.txt";
+    return error;
 
-    cv::Mat features = cv::Mat::ones(1, 2, CV_32F);
-
-    feature_row = data.second;
-
-    cv::Mat labels = cv::Mat();
-
-    model.second->predict(feature_row,y_);
-
-    std::ofstream output(filename);
-
-    output << "x1" << "," << "x2" << "," << "y" << "\n";
-
-    for(int i = 0; i < feature_row.rows; i++){
-
-        auto input = cv::InputArray(feature_row.row(i));
-
-        output << feature_row.at<float>(i,0) << "," << feature_row.at<float>(i,1)  << "," <<  y_predict.getMatRef().at<float>(i,0) << "\n";
-    }
   }
 
   namespace data{
 
-    std::string factory::text(data::factory::type type){
-      switch()
+    std::string factory::text(const factory::type& type){
+      switch(type)
       {
       case blob:
         return "blob";
       case circle:
         return "circle";
-      case Enum::Apple:
+      case moon:
         return "moon" ;
       default:
         return "unknown";
       }
     }
 
-    cv::Ptr<cv::ml::TrainData> factory::_new(const svm::factory::type& type){
-      return readTextFile(path+text(type));
+    cv::Ptr<cv::ml::TrainData> factory::_new(const data::factory::type& type){
+      return read(path+text(type));
     }
   }
 }
 
 namespace svm{
 
-  cv::Ptr<cv::ml::StatModel> factory::_new(const svm::factory::type& type){
+  cv::Ptr<cv::ml::StatModel> factory::_new(const factory::type& type){
 
     auto algorithm = cv::ml::SVM::create();
     auto criteria = cv::TermCriteria();
@@ -146,6 +124,14 @@ namespace svm{
         algorithm->setCoef0(0.3);
         algorithm->setTermCriteria(criteria);
         algorithm->setKernel(algorithm->RBF);
+        algorithm->setType(algorithm->C_SVC);
+        break;
+      case polymomial:
+        algorithm->setC(100);
+        algorithm->setGamma(0.1);
+        algorithm->setCoef0(0.3);
+        algorithm->setTermCriteria(criteria);
+        algorithm->setKernel(algorithm->POLY);
         algorithm->setType(algorithm->C_SVC);
         break;
       case sigmoid:
@@ -170,6 +156,8 @@ namespace svm{
 
     return algorithm;
 
+  }
+
 };
 
 int main(int argc, const char * argv[]) {
@@ -179,6 +167,6 @@ int main(int argc, const char * argv[]) {
    //auto data = utils::data::factory::_new(utils::data::factory::type::blob);
    //auto algo = utils::svm::factory::_new(utils::svm::factory::type::linear);
 
-   train(svm::factory::type::linear,utils::data::factory::type::blob);
+   std::cout << utils::train(svm::factory::type::linear, utils::data::factory::type::blob) << "\n";
 
 }
