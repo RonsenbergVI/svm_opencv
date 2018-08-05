@@ -69,7 +69,7 @@ namespace utils{
 
     auto gamma = cv::ml::ParamGrid::create(0.1,10,1);
     auto alpha = cv::ml::ParamGrid::create(0.1,10,1);
-    auto beta = cv::ml::ParamGrid::create(0.1,10,1);
+    auto beta = cv::ml::SVM::getDefaultGrid(cv::ml::SVM::DEGREE);
     auto nu = cv::ml::SVM::getDefaultGrid(cv::ml::SVM::NU);
     auto p = cv::ml::SVM::getDefaultGrid(cv::ml::SVM::P);
 
@@ -124,7 +124,7 @@ namespace svm{
         algorithm->setKernel(algorithm->RBF);
         break;
       case polymomial:
-        algorithm->setDegree(3.0);
+        algorithm->setDegree(2.0);
         algorithm->setKernel(algorithm->POLY);
         break;
       case sigmoid:
