@@ -69,17 +69,38 @@ namespace utils{
     auto data = utils::data::factory::_new(dataType);
     auto model = svm::factory::_new(modelType);
 
-    auto y_ = cv::OutputArray(cv::Mat());
-
-    y_.clear();
+    cv::ml::ParamGrid C(10,100,10);
+    cv::ml::ParamGrid gamma(0.1,10,1);
+    cv::ml::ParamGrid alpha(0.1,10,1);
+    cv::ml::ParamGrid beta(0.1,10,1);
+    cv::ml::ParamGrid nu(10,100,10);
+    cv::ml::ParamGrid p(10,100,10);
 
     data->setTrainTestSplitRatio(0.2,true);
 
+    switch (type) {
+      case linear:
+        algorithm->setKernel(algorithm->LINEAR);
+        break;
+      case rbf:
+        algorithm->setKernel(algorithm->RBF);
+        break;
+      case polymomial:
+        algorithm->setKernel(algorithm->POLY);
+        break;
+      case sigmoid:
+        algorithm->setKernel(algorithm->SIGMOID);
+        break;
+      case chi2:
+        algorithm->setKernel(algorithm->CHI2);
+        break;
+      default:
+        throw "invalid type";
+    }
+
     model->train(data);
-
-    auto error = model->calcError(data, true, y_);
-
-    return error;
+  
+    return model->calcError(data, true, cv::noArray());
   }
 
   namespace data{
@@ -113,59 +134,69 @@ namespace svm{
     criteria.type = CV_TERMCRIT_EPS;
     criteria.epsilon = 1e-10;
 
+    algorithm->setType(algorithm->C_SVC);
+    algorithm->setTermCriteria(criteria);
+
     switch (type) {
       case linear:
-        algorithm->setC(100);
         algorithm->setKernel(algorithm->LINEAR);
-        algorithm->setTermCriteria(criteria);
-        algorithm->setType(algorithm->C_SVC);
         break;
       case rbf:
-        algorithm->setC(100);
-        algorithm->setGamma(0.1);
-        algorithm->setCoef0(0.3);
-        algorithm->setTermCriteria(criteria);
         algorithm->setKernel(algorithm->RBF);
-        algorithm->setType(algorithm->C_SVC);
         break;
       case polymomial:
-        algorithm->setC(100);
-        algorithm->setGamma(0.1);
-        algorithm->setCoef0(0.3);
-        algorithm->setTermCriteria(criteria);
         algorithm->setKernel(algorithm->POLY);
-        algorithm->setType(algorithm->C_SVC);
         break;
       case sigmoid:
-        algorithm->setC(100);
-        algorithm->setGamma(0.1);
-        algorithm->setCoef0(0.3);
-        algorithm->setTermCriteria(criteria);
         algorithm->setKernel(algorithm->SIGMOID);
-        algorithm->setType(algorithm->C_SVC);
         break;
       case chi2:
-        algorithm->setC(100);
-        algorithm->setGamma(0.1);
-        algorithm->setCoef0(0.3);
-        algorithm->setTermCriteria(criteria);
         algorithm->setKernel(algorithm->CHI2);
-        algorithm->setType(algorithm->C_SVC);
         break;
       default:
         throw "invalid type";
     }
-
     return algorithm;
-
   }
-
 };
 
 int main(int argc, const char * argv[]) {
 
    utils::data::factory::path = std::string(argv[1]);
 
+
    std::cout << utils::train(svm::factory::type::linear, utils::data::factory::type::blob) << "\n";
+
+   std::cout << utils::train(svm::factory::type::linear, utils::data::factory::type::circle) << "\n";
+
+   std::cout << utils::train(svm::factory::type::linear, utils::data::factory::type::moon) << "\n";
+
+
+   std::cout << utils::train(svm::factory::type::rbf, utils::data::factory::type::blob) << "\n";
+
+   std::cout << utils::train(svm::factory::type::rbf, utils::data::factory::type::circle) << "\n";
+
+   std::cout << utils::train(svm::factory::type::rbf, utils::data::factory::type::moon) << "\n";
+
+
+   std::cout << utils::train(svm::factory::type::polymomial, utils::data::factory::type::blob) << "\n";
+
+   std::cout << utils::train(svm::factory::type::polymomial, utils::data::factory::type::circle) << "\n";
+
+   std::cout << utils::train(svm::factory::type::polymomial, utils::data::factory::type::moon) << "\n";
+
+
+   std::cout << utils::train(svm::factory::type::sigmoid, utils::data::factory::type::blob) << "\n";
+
+   std::cout << utils::train(svm::factory::type::sigmoid, utils::data::factory::type::circle) << "\n";
+
+   std::cout << utils::train(svm::factory::type::sigmoid, utils::data::factory::type::moon) << "\n";
+
+
+   std::cout << utils::train(svm::factory::type::chi2, utils::data::factory::type::blob) << "\n";
+
+   std::cout << utils::train(svm::factory::type::chi2, utils::data::factory::type::circle) << "\n";
+
+   std::cout << utils::train(svm::factory::type::chi2, utils::data::factory::type::moon) << "\n";
 
 }
