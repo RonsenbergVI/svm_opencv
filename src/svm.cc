@@ -36,8 +36,6 @@ namespace utils{
 
     std::string str;
 
-    std::cout << path << "\n";
-
     std::ifstream file(path);
 
     float x,y,z;
@@ -59,9 +57,7 @@ namespace utils{
         labels.push_back(label_row);
     }
 
-    auto result = cv::ml::TrainData::create(features, 0, labels);
-
-    return result;
+    return cv::ml::TrainData::create(features, 0, labels);
   }
 
   float train(const svm::factory::type& modelType, const data::factory::type& dataType){
@@ -69,37 +65,20 @@ namespace utils{
     auto data = utils::data::factory::_new(dataType);
     auto model = svm::factory::_new(modelType);
 
-    cv::ml::ParamGrid C(10,100,10);
-    cv::ml::ParamGrid gamma(0.1,10,1);
-    cv::ml::ParamGrid alpha(0.1,10,1);
-    cv::ml::ParamGrid beta(0.1,10,1);
-    cv::ml::ParamGrid nu(10,100,10);
-    cv::ml::ParamGrid p(10,100,10);
+    auto C = cv::ml::ParamGrid::create(10,100,10);
+
+    auto gamma = cv::ml::ParamGrid::create(0.1,10,1);
+    auto alpha = cv::ml::ParamGrid::create(0.1,10,1);
+    auto beta = cv::ml::ParamGrid::create(0.1,10,1);
+    auto nu = cv::ml::SVM::getDefaultGrid(cv::ml::SVM::NU);
+    auto p = cv::ml::SVM::getDefaultGrid(cv::ml::SVM::P);
 
     data->setTrainTestSplitRatio(0.2,true);
 
-    switch (type) {
-      case linear:
-        algorithm->setKernel(algorithm->LINEAR);
-        break;
-      case rbf:
-        algorithm->setKernel(algorithm->RBF);
-        break;
-      case polymomial:
-        algorithm->setKernel(algorithm->POLY);
-        break;
-      case sigmoid:
-        algorithm->setKernel(algorithm->SIGMOID);
-        break;
-      case chi2:
-        algorithm->setKernel(algorithm->CHI2);
-        break;
-      default:
-        throw "invalid type";
-    }
+    //model->trainAuto(data,double(1.0),C,gamma,p,nu,alpha,beta,false);
 
-    model->train(data);
-  
+    model->trainAuto(data);
+
     return model->calcError(data, true, cv::noArray());
   }
 
@@ -126,7 +105,7 @@ namespace utils{
 
 namespace svm{
 
-  cv::Ptr<cv::ml::StatModel> factory::_new(const svm::factory::type& type){
+  cv::Ptr<cv::ml::SVM> factory::_new(const svm::factory::type& type){
 
     auto algorithm = cv::ml::SVM::create();
     auto criteria = cv::TermCriteria();
@@ -145,6 +124,7 @@ namespace svm{
         algorithm->setKernel(algorithm->RBF);
         break;
       case polymomial:
+        algorithm->setDegree(3.0);
         algorithm->setKernel(algorithm->POLY);
         break;
       case sigmoid:
@@ -163,7 +143,6 @@ namespace svm{
 int main(int argc, const char * argv[]) {
 
    utils::data::factory::path = std::string(argv[1]);
-
 
    std::cout << utils::train(svm::factory::type::linear, utils::data::factory::type::blob) << "\n";
 

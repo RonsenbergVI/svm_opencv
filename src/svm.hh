@@ -43,7 +43,7 @@ namespace svm{
       chi2
     };
 
-    static cv::Ptr<cv::ml::StatModel> _new(const svm::factory::type&);
+    static cv::Ptr<cv::ml::SVM> _new(const svm::factory::type&);
 
   };
 }
